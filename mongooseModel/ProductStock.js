@@ -4,16 +4,17 @@ const mongoose = require('mongoose'),
     var Float = require('mongoose-float').loadType(mongoose);
 var productSchema = Schema({
     productSku: {
-        // type: Schema.Types.ObjectId,
-        // ref: "product",
-        // required: true
         type: String
     },
-    priceInr: {
+    stock: {
+        type: mongoose.Schema.Types.Mixed
+    },
+   
+    totalAvailableStock: {
         type: Number
     },
-    priceUsd: {
-        type: Float
+    totalPurchased: {
+        type: Number
     }
 });
 var productData = mongoose.model('ProductStock', productSchema);

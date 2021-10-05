@@ -1,8 +1,6 @@
 
 var { productData } = require('../mongooseModel/ProductStock.js');
-
 require('dotenv').config();
-
 var _ = require('lodash');
 var jwt = require("jsonwebtoken")
 var jwtDecode = require("jwt-decode")
@@ -60,8 +58,9 @@ exports.save = async function (data) {
     let saveProduct
        let newProductObj = {
         productSku: data.productSku,
-        productName: data.productName,
-          
+        stock: data.stock,
+        totalAvailableStock:data.totalAvailableStock,
+        totalPurchased:data.totalPurchased
        }
        let productObj = new productData(newProductObj)
        saveProduct = await productObj.save()
