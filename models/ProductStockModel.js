@@ -7,9 +7,7 @@ var jwtDecode = require("jwt-decode")
 var sha256 = require("js-sha256").sha256
 var axios = require("axios")
 var jwtKey = process.env.JWT_KEY
-exports.getAll = async function (accesstoken) {
-    var arry = [];
-   var metaObj=[]
+exports.getAll = async function (data) {
     var checkProduct= await productData.find({
     })
     if (_.isEmpty(checkProduct)) {
@@ -18,39 +16,9 @@ exports.getAll = async function (accesstoken) {
             value: false
         }
     }
-    var getPriceData = await axios.get('http://localhost:3001/getAll',{
-          headers: {
-              'Content-Type': 'application/json',
-              'accessToken': accesstoken
-          },      
-      })      
-      .then((response) => {
-        console.log('response',response.data)
-       return response.data
-      })
-      .catch((error) => {
-        alert('error',error.response)
-     
-      })
-    arry = arry.concat(checkProduct).concat(getPriceData)
-    console.log("arry",arry)
-    var grounByPhase = _.groupBy(arry, "productSku");
-    console.log(grounByPhase,"grounByPhase") 
-    _.each(grounByPhase, (value, key) => {
-    //     _.each(value,(item)=>{
-    //    var grounBy = _.groupBy(value, "productSku");
-    //   console.log("grounBy",grounBy)
-     
-    //         })
-     metaObj.push({
-           name: key,
-          value: value,
-        })
-      });
        return {
-           data: metaObj,
-           value: true
-        
+           data: checkProduct,
+           value: true  
        }
    
 },
@@ -76,6 +44,94 @@ exports.save = async function (data) {
         value: true
     }
        
+},
+exports.purchaseProduct = async function (data) {
+    var checkProduct= await productData.findOne({
+        productSku:data.productSku
+    })
+    if (_.isEmpty(checkProduct)) {
+        return {
+            data: "error",
+            value: false
+        }
+    }
+    console.log("checkProduct.totalAvailableStock",checkProduct.totalAvailableStock)
+   if(checkProduct.totalAvailableStock==0){
+   return {
+           data: "Out of Stock",
+           value: true  
+       } 
+   }else if(data.stock=="india"){
+       var indiaPurchased=0,indiaAvailable=0,totalAvailableStock=0,totalPurchased=0;
+       indiaPurchased= checkProduct.stock.india.indiaPurchased+1
+       indiaAvailable= checkProduct.stock.india.indiaAvailable-1
+       totalAvailableStock=checkProduct.totalAvailableStock-1
+       totalPurchased=checkProduct.totalPurchased+1
+       var updatedata = {
+        $set: {
+            stock: {
+                india:{indiaAvailable: indiaAvailable,
+                    indiaPurchased: indiaPurchased},
+                usa:{usaAvailable:checkProduct.stock.usa.usaAvailable,
+                        usaPurchased:checkProduct.stock.usa.usaPurchased}
+              },
+              totalAvailableStock:totalAvailableStock,
+              totalPurchased:totalPurchased
+        }
+    }
+
+const updateUser = await productData.findOneAndUpdate(
+    {
+        productSku:data.productSku
+    },
+    updatedata,
+    {
+        new: true
+    },
+  )
+if (updateUser) {
+    return {
+        data: " Successfully",
+        value: true
+    }
 }
+   }else if(data.stock=="usa"){
+    var usaAvailable=0,usaPurchased=0,totalAvailableStock=0,totalPurchased=0;
+    usaAvailable= checkProduct.stock.usa.usaAvailable-1
+    usaPurchased= checkProduct.stock.usa.usaPurchased+1
+    totalAvailableStock=checkProduct.totalAvailableStock-1
+    totalPurchased=checkProduct.totalPurchased+1
+    var updatedata = {
+     $set: {
+         stock: {
+             india:{indiaAvailable: checkProduct.stock.india.indiaAvailable,
+                 indiaPurchased: checkProduct.stock.india.indiaPurchased},
+             usa:{usaAvailable:usaAvailable,
+                     usaPurchased:usaPurchased}
+           },
+           totalAvailableStock:totalAvailableStock,
+           totalPurchased:totalPurchased
+     }
+ }
+
+const updateUser = await productData.findOneAndUpdate(
+ {
+     productSku:data.productSku
+ },
+ updatedata,
+ {
+     new: true
+ },
+)
+if (updateUser) {
+ return {
+     data: "Successfully",
+     value: true
+ }
+}
+   }
+    
+}
+
 
 
