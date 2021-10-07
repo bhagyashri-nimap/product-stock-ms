@@ -1,7 +1,6 @@
 const mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     ObjectId = mongoose.ObjectId;
-    var Float = require('mongoose-float').loadType(mongoose);
 var productSchema = Schema({
     productSku: {
         type: String

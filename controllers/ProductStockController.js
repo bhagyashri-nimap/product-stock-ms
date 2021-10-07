@@ -17,33 +17,26 @@ router.post("/save", async (req, res) => {
     }
 }),
 router.get("/getAll", authenticateUser,async (req, res) => {
-    console.log("req.body",req.headers.accesstoken)
     try {
         var data = await ProductModel.getAll(req.body)
         if (data.value) {
-        
-            res.status(200).json(data.data)
+           res.status(200).json(data.data)
         } else {
-            console.log("data2",data)
             res.status(500).json(data)
         }
     } catch (error) {
-        console.log("data3",error)
         res.status(500).send(error)
     }
 }),
 router.post("/purchaseProduct", authenticateUser,async (req, res) => {
-    console.log("req.body",req.headers.accesstoken)
     try {
         var data = await ProductModel.purchaseProduct(req.body)
         if (data.value) {
             res.status(200).json(data.data)
         } else {
-            console.log("data2",data)
             res.status(500).json(data)
         }
     } catch (error) {
-        console.log("data3",error)
         res.status(500).send(error)
     }
 })
