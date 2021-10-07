@@ -2,11 +2,7 @@
 var { productData } = require('../mongooseModel/ProductStock.js');
 require('dotenv').config();
 var _ = require('lodash');
-var jwt = require("jsonwebtoken")
-var jwtDecode = require("jwt-decode")
-var sha256 = require("js-sha256").sha256
-var axios = require("axios")
-var jwtKey = process.env.JWT_KEY
+
 exports.getAll = async function (data) {
     var checkProduct= await productData.find({
     })
@@ -55,13 +51,12 @@ exports.purchaseProduct = async function (data) {
             value: false
         }
     }
-    console.log("checkProduct.totalAvailableStock",checkProduct.totalAvailableStock)
    if(checkProduct.totalAvailableStock==0){
    return {
            data: "Out of Stock",
            value: true  
        } 
-   }else if(data.stock=="india"){
+   }else if(data.country=="india"){
        var indiaPurchased=0,indiaAvailable=0,totalAvailableStock=0,totalPurchased=0;
        indiaPurchased= checkProduct.stock.india.indiaPurchased+1
        indiaAvailable= checkProduct.stock.india.indiaAvailable-1
@@ -95,7 +90,7 @@ if (updateUser) {
         value: true
     }
 }
-   }else if(data.stock=="usa"){
+   }else if(data.country=="usa"){
     var usaAvailable=0,usaPurchased=0,totalAvailableStock=0,totalPurchased=0;
     usaAvailable= checkProduct.stock.usa.usaAvailable-1
     usaPurchased= checkProduct.stock.usa.usaPurchased+1
@@ -129,7 +124,7 @@ if (updateUser) {
      value: true
  }
 }
-   }
+}
     
 }
 
