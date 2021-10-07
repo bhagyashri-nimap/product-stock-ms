@@ -57,73 +57,87 @@ exports.purchaseProduct = async function (data) {
            value: true  
        } 
    }else if(data.country=="india"){
-       var indiaPurchased=0,indiaAvailable=0,totalAvailableStock=0,totalPurchased=0;
-       indiaPurchased= checkProduct.stock.india.indiaPurchased+1
-       indiaAvailable= checkProduct.stock.india.indiaAvailable-1
-       totalAvailableStock=checkProduct.totalAvailableStock-1
-       totalPurchased=checkProduct.totalPurchased+1
-       var updatedata = {
-        $set: {
-            stock: {
-                india:{indiaAvailable: indiaAvailable,
-                    indiaPurchased: indiaPurchased},
-                usa:{usaAvailable:checkProduct.stock.usa.usaAvailable,
-                        usaPurchased:checkProduct.stock.usa.usaPurchased}
-              },
-              totalAvailableStock:totalAvailableStock,
-              totalPurchased:totalPurchased
-        }
-    }
-
-const updateUser = await productData.findOneAndUpdate(
-    {
-        productSku:data.productSku
-    },
-    updatedata,
-    {
-        new: true
-    },
-  )
-if (updateUser) {
-    return {
-        data: " Successfully",
-        value: true
-    }
-}
-   }else if(data.country=="usa"){
-    var usaAvailable=0,usaPurchased=0,totalAvailableStock=0,totalPurchased=0;
-    usaAvailable= checkProduct.stock.usa.usaAvailable-1
-    usaPurchased= checkProduct.stock.usa.usaPurchased+1
-    totalAvailableStock=checkProduct.totalAvailableStock-1
-    totalPurchased=checkProduct.totalPurchased+1
-    var updatedata = {
-     $set: {
-         stock: {
-             india:{indiaAvailable: checkProduct.stock.india.indiaAvailable,
-                 indiaPurchased: checkProduct.stock.india.indiaPurchased},
-             usa:{usaAvailable:usaAvailable,
-                     usaPurchased:usaPurchased}
-           },
-           totalAvailableStock:totalAvailableStock,
-           totalPurchased:totalPurchased
+       if(checkProduct.stock.india.indiaAvailable==0){
+        return {
+            data: "Out of Stock India",
+            value: true  
+        }  
+       }else{
+        var indiaPurchased=0,indiaAvailable=0,totalAvailableStock=0,totalPurchased=0;
+        indiaPurchased= checkProduct.stock.india.indiaPurchased+1
+        indiaAvailable= checkProduct.stock.india.indiaAvailable-1
+        totalAvailableStock=checkProduct.totalAvailableStock-1
+        totalPurchased=checkProduct.totalPurchased+1
+        var updatedata = {
+         $set: {
+             stock: {
+                 india:{indiaAvailable: indiaAvailable,
+                     indiaPurchased: indiaPurchased},
+                 usa:{usaAvailable:checkProduct.stock.usa.usaAvailable,
+                         usaPurchased:checkProduct.stock.usa.usaPurchased}
+               },
+               totalAvailableStock:totalAvailableStock,
+               totalPurchased:totalPurchased
+         }
+     }
+ 
+ const updateUser = await productData.findOneAndUpdate(
+     {
+         productSku:data.productSku
+     },
+     updatedata,
+     {
+         new: true
+     },
+   )
+ if (updateUser) {
+     return {
+         data: "Successfully",
+         value: true
      }
  }
-
-const updateUser = await productData.findOneAndUpdate(
- {
-     productSku:data.productSku
- },
- updatedata,
- {
-     new: true
- },
-)
-if (updateUser) {
- return {
-     data: "Successfully",
-     value: true
- }
-}
+       }
+      
+   }else if(data.country=="usa"){
+    if(checkProduct.stock.usa.usaAvailable==0){
+        return {
+            data: "Out of Stock Usa",
+            value: true  
+        }  
+       }else{var usaAvailable=0,usaPurchased=0,totalAvailableStock=0,totalPurchased=0;
+        usaAvailable= checkProduct.stock.usa.usaAvailable-1
+        usaPurchased= checkProduct.stock.usa.usaPurchased+1
+        totalAvailableStock=checkProduct.totalAvailableStock-1
+        totalPurchased=checkProduct.totalPurchased+1
+        var updatedata = {
+         $set: {
+             stock: {
+                 india:{indiaAvailable: checkProduct.stock.india.indiaAvailable,
+                     indiaPurchased: checkProduct.stock.india.indiaPurchased},
+                 usa:{usaAvailable:usaAvailable,
+                         usaPurchased:usaPurchased}
+               },
+               totalAvailableStock:totalAvailableStock,
+               totalPurchased:totalPurchased
+         }
+     }
+    
+    const updateUser = await productData.findOneAndUpdate(
+     {
+         productSku:data.productSku
+     },
+     updatedata,
+     {
+         new: true
+     },
+    )
+    if (updateUser) {
+     return {
+         data: "Successfully",
+         value: true
+     }
+    }}
+    
 }
     
 }
